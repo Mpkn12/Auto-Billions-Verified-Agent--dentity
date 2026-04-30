@@ -1,7 +1,7 @@
 name: Billions Agent Verification
 
 on:
-  workflow_dispatch:
+  workflow_dispatch: 
 
 jobs:
   verify-agent:
@@ -24,9 +24,18 @@ jobs:
 
       - name: Run Identity Flow
         run: |
+          # Pindahkan file identity.json ke folder scripts agar terbaca oleh node
+          cp identity.json skills/verified-agent-identity/scripts/identity.json
+          
           cd skills/verified-agent-identity/scripts
+          
+          # Membuat DID baru
           AGENT_DID=$(node createNewEthereumIdentity.js | tail -n 1)
           echo "AGENT_DID=$AGENT_DID"
+          
+          # Membuat Challenge
           CHALLENGE=$(node generateChallenge.js --did $AGENT_DID | tail -n 1)
           echo "CHALLENGE=$CHALLENGE"
+          
+          # Link ke Human (Output akan berisi URL verifikasi)
           node linkHumanToAgent.js --did $AGENT_DID --challenge $CHALLENGE
